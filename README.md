@@ -1,37 +1,30 @@
-# Simple Flask Web Application with Kubernetes Deployment 👋
+# Simple Flask Web Application with Docker Compose and NGINX Load Balancer
 
-This project is a simple "Hello, World!" style web application using Flask, containerized with Docker, and deployed on Kubernetes.
+This project is a simple "Hello, World!" style web application using Flask. It is containerized using Docker and run as two separate services using Docker Compose. An NGINX server is also included in the Docker Compose setup to act as a round-robin load balancer between the two application instances.
 
-## Application Code 🐍
+## Application Code (`task5/app.py`)
 
-*   **`task1/app.py`**: This is the main application file. It's a simple Flask web server that displays a greeting message. The message is retrieved from the `GREETING` environment variable. If the variable is not set, it defaults to "Hello, World!".
+This is the main application file. It's a simple Flask web server that displays a greeting message. The message is retrieved from the `SERVER_MESSAGE` environment variable. If the variable is not set, it defaults to "Hello from an unknown server!".
 
-*   **`task1/requirements.txt`**: This file lists the Python dependencies for the project. In this case, the only dependency is `Flask`.
+## Containerization (`task5/Dockerfile`)
 
-## Containerization 🐳
+This file contains the instructions to build a Docker image for the application. It uses a Python base image, installs the dependencies from `requirements.txt`, copies the application code, and sets the command to run the application.
 
-*   **`task1/Dockerfile`**: This file contains the instructions to build a Docker image for the application. It uses a Python base image, installs the dependencies, copies the application code, and sets the command to run the application.
+## Services and Load Balancing (`task5/docker-compose.yml` and `task5/nginx.conf`)
 
-To build the Docker image, run the following command in the `task1` directory:
+The `docker-compose.yml` file defines the services that make up the application:
 
-```bash
-docker build -t your-dockerhub-username/heypico-task-1:1.0 .
-```
+*   **`webapp1` & `webapp2`**: Two instances of the Flask application, each with a different `SERVER_MESSAGE`.
+*   **`nginx-proxy`**: An NGINX service that acts as a reverse proxy for the two web applications.
 
-## Kubernetes Deployment 🚀
+The `nginx.conf` file configures the NGINX server to perform round-robin load balancing between `webapp1` and `webapp2`.
 
-The application is deployed to Kubernetes using the following configuration files:
+## How to Run
 
-*   **`task1/configmap.yaml`**: This file defines a ConfigMap that holds the configuration data for the application. In this case, it sets the `GREETING_MESSAGE` that will be used by the Flask application.
-
-*   **`task1/deployment.yaml`**: This file defines a Deployment that manages the application pods. It specifies that two replicas of the application should be running. It also maps the `GREETING` environment variable in the container to the `GREETING_MESSAGE` from the ConfigMap.
-
-*   **`task1/service.yaml`**: This file defines a Service that exposes the application to the network. It uses a `NodePort` to make the application accessible from outside the Kubernetes cluster.
-
-To deploy the application to Kubernetes, apply the configuration files in the following order:
-
-```bash
-kubectl apply -f task1/configmap.yaml
-kubectl apply -f task1/deployment.yaml
-kubectl apply -f task1/service.yaml
-```
+1.  Make sure you have Docker and Docker Compose installed.
+2.  Navigate to the `task5` directory.
+3.  Run the following command:
+    ```bash
+    docker-compose up
+    ```
+4.  Open your web browser and navigate to `http://localhost`. You should see a message from one of the servers. If you refresh the page, you should see the message change as NGINX routes you to the other server.
