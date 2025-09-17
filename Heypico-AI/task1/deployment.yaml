@@ -1,0 +1,25 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: webapp-deployment
+spec:
+  replicas: 2 
+  selector:
+    matchLabels:
+      app: my-webapp
+  template:
+    metadata:
+      labels:
+        app: my-webapp
+    spec:
+      containers:
+      - name: webapp-container
+        image: rbhnlvng/heypico-task-1:1.0
+        ports:
+        - containerPort: 5000
+        env:
+          - name: GREETING 
+            valueFrom:
+              configMapKeyRef:
+                name: webapp-config 
+                key: GREETING_MESSAGE 
