@@ -1,163 +1,126 @@
-<<<<<<< HEAD
-<<<<<<< HEAD
-<<<<<<< HEAD
-# 🚀 Infrastructure as Code with Terraform and AWS
-=======
-# 🚀 Automated Web Infrastructure on AWS with Prometheus & Grafana Monitoring
->>>>>>> Heypico-Task4
+# 🚀 DevOps Projects Repository 🚀
 
-This repository contains Terraform code to automatically provision a web infrastructure on Amazon Web Services (AWS). This project creates an EC2 instance running an NGINX web server inside a custom VPC.
+Welcome to the DevOps Projects Repository! This repository is a collection of projects demonstrating various DevOps practices and tools. Each project is contained in its own directory and includes all the necessary files and instructions to run it.
 
-Additionally, this project includes a monitoring solution using Docker, Prometheus, and Grafana to monitor the EC2 instance.
+## 📂 Projects
 
-The goal of this project is to demonstrate how to use Terraform to manage infrastructure as code (IaC) and how to set up a monitoring stack for the provisioned infrastructure.
+Here's a brief overview of the projects included in this repository:
 
-## 📂 File Structure
+1.  [Kubernetes Deployment](./01-kubernetes-deployment)
+2.  [Terraform IaC](./02-terraform-iac)
+3.  [CI/CD with GitHub Actions](./03-cicd-github-actions)
+4.  [Monitoring Stack](./04-monitoring-stack)
+5.  [NGINX Reverse Proxy](./05-nginx-reverse-proxy)
 
-- `main.tf`: The main file that defines all the AWS resources to be created.
-- `variables.tf`: Defines the variables used in the Terraform configuration, such as the AWS region and project name.
-- `outputs.tf`: Defines the outputs of the Terraform configuration, such as the public IP address of the EC2 instance.
-- `docker-compose.yml`: Defines the services for the monitoring stack: Prometheus, Grafana, Node Exporter, and Alertmanager.
-- `prometheus.yml`: Configuration file for Prometheus, defining the scrape targets.
-- `alert.rules.yml`: Defines the alerting rules for Prometheus.
-- `alertmanager.yml`: Configuration file for Alertmanager.
+---
 
-## Monitoring Solution
+## 📖 Project Details
 
-The monitoring solution consists of the following components:
+In this section, you will find detailed information about each project.
 
-- **Prometheus:** A time-series database and monitoring system that scrapes metrics from the EC2 instance.
-- **Grafana:** A visualization tool that allows you to create dashboards to display the metrics collected by Prometheus.
-- **Node Exporter:** An exporter for hardware and OS metrics exposed by *NIX kernels.
-- **Alertmanager:** Handles alerts sent by client applications such as the Prometheus server.
+### 1. 📦 Kubernetes Deployment
 
-These components are deployed as Docker containers using Docker Compose.
+This project demonstrates how to deploy a simple Python Flask web application on a Kubernetes cluster. The application displays a message that can be configured using a ConfigMap.
 
-## 🛠️ Usage
+**Components:**
+- `app.py`: A simple Flask web application.
+- `requirements.txt`: Python dependencies for the application.
+- `Dockerfile`: To containerize the Flask application.
+- `deployment.yaml`: Kubernetes deployment configuration.
+- `service.yaml`: Kubernetes service to expose the application.
+- `configmap.yaml`: Kubernetes ConfigMap to manage application configuration.
 
-### Prerequisites
+**Usage:**
+1. Build and push the Docker image to a registry.
+2. Update the `deployment.yaml` with your Docker image.
+3. Apply the Kubernetes manifests:
+   ```sh
+   kubectl apply -f 01-kubernetes-deployment/
+   ```
 
-- Terraform installed on your local machine.
-- AWS CLI installed and configured with your AWS credentials.
-- Docker and Docker Compose installed on the EC2 instance.
+### 2. 🏗️ Terraform IaC
 
-### 1. Provision the Infrastructure
+This project demonstrates how to use Terraform to provision a simple web server infrastructure on AWS. It creates a VPC, a subnet, a security group, and an EC2 instance running an NGINX web server.
 
-Navigate to the `task4/` directory and run the following command to initialize the Terraform working directory:
-```sh
-terraform init
-```
+**Components:**
+- `main.tf`: The main Terraform file that defines the AWS resources.
+- `variables.tf`: Defines the variables used in the Terraform configuration.
+- `outputs.tf`: Defines the outputs of the Terraform configuration, such as the public IP of the EC2 instance.
 
-Run the following command to see the changes that Terraform will apply:
-```sh
-terraform plan
-```
+**Usage:**
+1. Configure your AWS credentials.
+2. Initialize Terraform:
+   ```sh
+   terraform init
+   ```
+3. Apply the Terraform configuration:
+   ```sh
+   terraform apply
+   ```
+4. To destroy the infrastructure, run:
+   ```sh
+   terraform destroy
+   ```
 
-Apply the changes by running:
-```sh
-terraform apply
-```
-Enter `yes` when prompted to confirm. After the deployment is complete, the public IP address of the EC2 instance will be displayed as an output.
+### 3. 🔄 CI/CD with GitHub Actions
 
-### 2. Deploy the Monitoring Stack
+This project demonstrates how to set up a CI/CD pipeline using GitHub Actions to automatically test, build, and deploy a Flask web application.
 
-SSH into the created EC2 instance:
-```sh
-ssh -i /path/to/your/key.pem ec2-user@<your_ec2_public_ip>
-```
+**Components:**
+- `app.py`: The Flask web application.
+- `test_app.py`: Unit tests for the application.
+- `Dockerfile`: To containerize the application.
+- `.github/workflows/cicd-pipeline.yml`: The GitHub Actions workflow file.
 
-Install Docker and Docker Compose on the EC2 instance:
-```sh
-sudo yum update -y
-sudo yum install -y docker
-sudo systemctl start docker
-sudo systemctl enable docker
-sudo curl -L "https://github.com/docker/compose/releases/download/1.29.2/docker-compose-$(uname -s)-$(uname -m)" -o /usr/local/bin/docker-compose
-sudo chmod +x /usr/local/bin/docker-compose
-```
+**Pipeline:**
+1.  **Test:** Runs unit tests on every push to the `main` branch.
+2.  **Build and Push:** Builds a Docker image and pushes it to the GitHub Container Registry.
+3.  **Deploy:** Deploys the new Docker image to a staging server.
 
-Copy the monitoring configuration files (`docker-compose.yml`, `prometheus.yml`, `alert.rules.yml`, `alertmanager.yml`) to the EC2 instance, or clone this repository.
+**Usage:**
+- The pipeline is automatically triggered on every push to the `main` branch.
+- You need to configure the following secrets in your repository settings:
+  - `STAGING_SERVER_IP`: The IP address of your staging server.
+  - `STAGING_USERNAME`: The username for SSH access to the staging server.
+  - `STAGING_SSH_KEY`: The private SSH key for the staging server.
 
-Navigate to the directory containing the `docker-compose.yml` file and run:
-```sh
-docker-compose up -d
-```
+### 4. 📊 Monitoring Stack
 
-## Accessing Dashboards
+This project sets up a monitoring stack using Docker Compose. The stack includes Prometheus, Grafana, Node Exporter, and Alertmanager. The infrastructure for the monitoring stack is provisioned using Terraform.
 
-- **Prometheus:** Open your web browser and navigate to `http://<your_ec2_public_ip>:9090`
-- **Grafana:** Open your web browser and navigate to `http://<your_ec2_public_ip>:3000`
+**Components:**
+- `docker-compose.yml`: Defines the monitoring services.
+- `prometheus.yml`: Prometheus configuration file.
+- `alert.rules.yml`: Alerting rules for Prometheus.
+- `alertmanager.yml`: Alertmanager configuration file.
+- `main.tf`, `variables.tf`, `outputs.tf`: Terraform files to provision the infrastructure.
 
-## Destroy
+**Usage:**
+1.  Provision the infrastructure using Terraform as described in the **Terraform IaC** section.
+2.  SSH into the EC2 instance.
+3.  Install Docker and Docker Compose.
+4.  Run the monitoring stack:
+    ```sh
+    docker-compose up -d
+    ```
+5.  Access the services:
+    - **Prometheus:** `http://<your_ec2_public_ip>:9090`
+    - **Grafana:** `http://<your_ec2_public_ip>:3000`
+    - **Alertmanager:** `http://<your_ec2_public_ip>:9093`
 
-To clean up all the resources created by Terraform, run:
-```sh
-terraform destroy
-```
-=======
-# Simple Flask Web Application with an Automated CI/CD Pipeline
+### 5. 🌐 NGINX Reverse Proxy
 
-This project demonstrates a simple "Hello, World!" style web application using Flask. The key feature of this project is the fully automated CI/CD pipeline that tests, builds, and deploys the application whenever changes are pushed to the `main` branch.
+This project demonstrates how to use NGINX as a reverse proxy and load balancer for a Flask web application running in multiple containers.
 
-## CI/CD Pipeline
+**Components:**
+- `app.py`: The Flask web application.
+- `Dockerfile`: To containerize the application.
+- `docker-compose.yml`: Defines the application services and the NGINX proxy.
+- `nginx.conf`: NGINX configuration for reverse proxy and load balancing.
 
-The CI/CD pipeline is defined in `.github/workflows/cicd-pipeline.yml` and is orchestrated using GitHub Actions. It is triggered automatically on every push to the `main` branch.
-
-The pipeline consists of three main jobs:
-
-### 1. Run Unit Tests
-
-*   **Job Name:** `test`
-*   **Description:** This job checks out the code, sets up a Python environment, and installs the necessary dependencies from `task1/requirements.txt`. It then runs the unit tests defined in `task1/test_app.py` using `pytest` to ensure the application is working as expected.
-
-### 2. Build and Push Docker Image
-
-*   **Job Name:** `build_and_push`
-*   **Description:** This job depends on the successful completion of the `test` job. It builds a Docker image of the application using the `task1/Dockerfile`. After a successful build, it pushes the image to the GitHub Container Registry (ghcr.io). The image is tagged with the commit SHA to ensure a unique and traceable build.
-
-### 3. Deploy to Staging Server
-
-*   **Job Name:** `deploy`
-*   **Description:** This final job also depends on the successful completion of the `build_and_push` job. It connects to a staging server via SSH and deploys the newly built Docker image. It stops and removes any existing container of the application and then runs the new version.
-
-## Application Components
-
-*   **`task1/app.py`**: The main Flask application file.
-*   **`task1/requirements.txt`**: Python dependencies.
-*   **`task1/Dockerfile`**: Instructions for building the Docker image.
-*   **`task1/test_app.py`**: Unit tests for the application.
-
-*Note: The Kubernetes files (`configmap.yaml`, `deployment.yaml`, `service.yaml`) are included in the repository but are not used in the current CI/CD pipeline, which deploys directly to a server using Docker.*
->>>>>>> Heypico-Task3
-=======
-# Simple Flask Web Application with Docker Compose and NGINX Load Balancer
-
-This project is a simple "Hello, World!" style web application using Flask. It is containerized using Docker and run as two separate services using Docker Compose. An NGINX server is also included in the Docker Compose setup to act as a round-robin load balancer between the two application instances.
-
-## Application Code (`task5/app.py`)
-
-This is the main application file. It's a simple Flask web server that displays a greeting message. The message is retrieved from the `SERVER_MESSAGE` environment variable. If the variable is not set, it defaults to "Hello from an unknown server!".
-
-## Containerization (`task5/Dockerfile`)
-
-This file contains the instructions to build a Docker image for the application. It uses a Python base image, installs the dependencies from `requirements.txt`, copies the application code, and sets the command to run the application.
-
-## Services and Load Balancing (`task5/docker-compose.yml` and `task5/nginx.conf`)
-
-The `docker-compose.yml` file defines the services that make up the application:
-
-*   **`webapp1` & `webapp2`**: Two instances of the Flask application, each with a different `SERVER_MESSAGE`.
-*   **`nginx-proxy`**: An NGINX service that acts as a reverse proxy for the two web applications.
-
-The `nginx.conf` file configures the NGINX server to perform round-robin load balancing between `webapp1` and `webapp2`.
-
-## How to Run
-
-1.  Make sure you have Docker and Docker Compose installed.
-2.  Navigate to the `task5` directory.
-3.  Run the following command:
-    ```bash
+**Usage:**
+1.  Run the services using Docker Compose:
+    ```sh
     docker-compose up
     ```
-4.  Open your web browser and navigate to `http://localhost`. You should see a message from one of the servers. If you refresh the page, you should see the message change as NGINX routes you to the other server.
->>>>>>> Heypico-Task5
+2.  Open your web browser and navigate to `http://localhost`. You will see a message from one of the servers. Refresh the page to see the message from the other server.
