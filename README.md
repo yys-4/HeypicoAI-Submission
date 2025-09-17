@@ -1,37 +1,56 @@
-# Simple Flask Web Application with Kubernetes Deployment 👋
+# 🚀 Infrastructure as Code with Terraform and AWS
 
-This project is a simple "Hello, World!" style web application using Flask, containerized with Docker, and deployed on Kubernetes.
+This repository contains Terraform code to automatically provision a basic web infrastructure on Amazon Web Services (AWS). This project creates an EC2 instance running an NGINX web server inside a custom VPC.
 
-## Application Code 🐍
+The goal of this project is to demonstrate how to use Terraform to manage infrastructure as code (IaC). By defining the infrastructure in configuration files, we can create, modify, and destroy environments in a consistent and reproducible way.
 
-*   **`task1/app.py`**: This is the main application file. It's a simple Flask web server that displays a greeting message. The message is retrieved from the `GREETING` environment variable. If the variable is not set, it defaults to "Hello, World!".
+## 📂 File Structure
 
-*   **`task1/requirements.txt`**: This file lists the Python dependencies for the project. In this case, the only dependency is `Flask`.
+- `main.tf`: The main file that defines all the AWS resources to be created.
+- `variables.tf`: Defines the variables used in the Terraform configuration, such as the AWS region and project name.
+- `outputs.tf`: Defines the outputs of the Terraform configuration, such as the public IP address of the EC2 instance.
 
-## Containerization 🐳
+## 🚀 Resources Created
 
-*   **`task1/Dockerfile`**: This file contains the instructions to build a Docker image for the application. It uses a Python base image, installs the dependencies, copies the application code, and sets the command to run the application.
+- **Virtual Private Cloud (VPC):** An isolated network for your AWS resources.
+- **Subnet:** A sub-network within the VPC where the EC2 instance will reside.
+- **Security Group:** Acts as a virtual firewall for the EC2 instance, allowing inbound traffic on port 22 (SSH) and 80 (HTTP).
+- **Internet Gateway:** Enables communication between the VPC and the internet.
+- **Route Table:** Defines rules, called routes, to direct network traffic from the subnet.
+- **EC2 Instance:** A virtual server running Amazon Linux 2 with an NGINX web server installed and configured.
 
-To build the Docker image, run the following command in the `task1` directory:
+## 🛠️ Usage
 
-```bash
-docker build -t your-dockerhub-username/heypico-task-1:1.0 .
+### Prerequisites
+
+- Terraform installed on your local machine.
+- AWS CLI installed and configured with your AWS credentials.
+
+### Initialization
+
+Navigate to the `task2/` directory and run the following command to initialize the Terraform working directory:
+```sh
+terraform init
 ```
 
-## Kubernetes Deployment 🚀
+### Plan
 
-The application is deployed to Kubernetes using the following configuration files:
+Run the following command to see the changes that Terraform will apply:
+```sh
+terraform plan
+```
 
-*   **`task1/configmap.yaml`**: This file defines a ConfigMap that holds the configuration data for the application. In this case, it sets the `GREETING_MESSAGE` that will be used by the Flask application.
+### Apply
 
-*   **`task1/deployment.yaml`**: This file defines a Deployment that manages the application pods. It specifies that two replicas of the application should be running. It also maps the `GREETING` environment variable in the container to the `GREETING_MESSAGE` from the ConfigMap.
+Apply the changes by running:
+```sh
+terraform apply
+```
+Enter `yes` when prompted to confirm. After the deployment is complete, the public IP address of the EC2 instance will be displayed as an output.
 
-*   **`task1/service.yaml`**: This file defines a Service that exposes the application to the network. It uses a `NodePort` to make the application accessible from outside the Kubernetes cluster.
+### Destroy
 
-To deploy the application to Kubernetes, apply the configuration files in the following order:
-
-```bash
-kubectl apply -f task1/configmap.yaml
-kubectl apply -f task1/deployment.yaml
-kubectl apply -f task1/service.yaml
+To clean up all the resources created by Terraform, run:
+```sh
+terraform destroy
 ```
