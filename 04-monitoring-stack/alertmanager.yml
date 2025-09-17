@@ -1,0 +1,7 @@
+route:
+  receiver: 'slack-notifications'
+receivers:
+  - name: 'slack-notifications'
+    slack_configs:
+      - api_url: 'https://hooks.slack.com/services/YOUR/SLACK/WEBHOOK' # Adjust to your Slack webhook URL
+        send_resolved: true
