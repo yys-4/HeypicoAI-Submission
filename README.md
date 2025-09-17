@@ -1,37 +1,33 @@
-# Simple Flask Web Application with Kubernetes Deployment 👋
+# Simple Flask Web Application with an Automated CI/CD Pipeline
 
-This project is a simple "Hello, World!" style web application using Flask, containerized with Docker, and deployed on Kubernetes.
+This project demonstrates a simple "Hello, World!" style web application using Flask. The key feature of this project is the fully automated CI/CD pipeline that tests, builds, and deploys the application whenever changes are pushed to the `main` branch.
 
-## Application Code 🐍
+## CI/CD Pipeline
 
-*   **`task1/app.py`**: This is the main application file. It's a simple Flask web server that displays a greeting message. The message is retrieved from the `GREETING` environment variable. If the variable is not set, it defaults to "Hello, World!".
+The CI/CD pipeline is defined in `.github/workflows/cicd-pipeline.yml` and is orchestrated using GitHub Actions. It is triggered automatically on every push to the `main` branch.
 
-*   **`task1/requirements.txt`**: This file lists the Python dependencies for the project. In this case, the only dependency is `Flask`.
+The pipeline consists of three main jobs:
 
-## Containerization 🐳
+### 1. Run Unit Tests
 
-*   **`task1/Dockerfile`**: This file contains the instructions to build a Docker image for the application. It uses a Python base image, installs the dependencies, copies the application code, and sets the command to run the application.
+*   **Job Name:** `test`
+*   **Description:** This job checks out the code, sets up a Python environment, and installs the necessary dependencies from `task1/requirements.txt`. It then runs the unit tests defined in `task1/test_app.py` using `pytest` to ensure the application is working as expected.
 
-To build the Docker image, run the following command in the `task1` directory:
+### 2. Build and Push Docker Image
 
-```bash
-docker build -t your-dockerhub-username/heypico-task-1:1.0 .
-```
+*   **Job Name:** `build_and_push`
+*   **Description:** This job depends on the successful completion of the `test` job. It builds a Docker image of the application using the `task1/Dockerfile`. After a successful build, it pushes the image to the GitHub Container Registry (ghcr.io). The image is tagged with the commit SHA to ensure a unique and traceable build.
 
-## Kubernetes Deployment 🚀
+### 3. Deploy to Staging Server
 
-The application is deployed to Kubernetes using the following configuration files:
+*   **Job Name:** `deploy`
+*   **Description:** This final job also depends on the successful completion of the `build_and_push` job. It connects to a staging server via SSH and deploys the newly built Docker image. It stops and removes any existing container of the application and then runs the new version.
 
-*   **`task1/configmap.yaml`**: This file defines a ConfigMap that holds the configuration data for the application. In this case, it sets the `GREETING_MESSAGE` that will be used by the Flask application.
+## Application Components
 
-*   **`task1/deployment.yaml`**: This file defines a Deployment that manages the application pods. It specifies that two replicas of the application should be running. It also maps the `GREETING` environment variable in the container to the `GREETING_MESSAGE` from the ConfigMap.
+*   **`task1/app.py`**: The main Flask application file.
+*   **`task1/requirements.txt`**: Python dependencies.
+*   **`task1/Dockerfile`**: Instructions for building the Docker image.
+*   **`task1/test_app.py`**: Unit tests for the application.
 
-*   **`task1/service.yaml`**: This file defines a Service that exposes the application to the network. It uses a `NodePort` to make the application accessible from outside the Kubernetes cluster.
-
-To deploy the application to Kubernetes, apply the configuration files in the following order:
-
-```bash
-kubectl apply -f task1/configmap.yaml
-kubectl apply -f task1/deployment.yaml
-kubectl apply -f task1/service.yaml
-```
+*Note: The Kubernetes files (`configmap.yaml`, `deployment.yaml`, `service.yaml`) are included in the repository but are not used in the current CI/CD pipeline, which deploys directly to a server using Docker.*
