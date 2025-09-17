@@ -1,0 +1,29 @@
+version: '3.8'
+
+services:
+  # Application Service 1
+  webapp1:
+    build: .
+    container_name: webapp1
+    environment:
+      - SERVER_MESSAGE=Hello from Server 1 (Pico)
+
+  # Application Service 2
+  webapp2:
+    build: .
+    container_name: webapp2
+    environment:
+      - SERVER_MESSAGE=Hello from Server 2 (Polo)
+
+  # NGINX Reverse Proxy Service
+  nginx-proxy:
+    image: nginx:latest
+    container_name: nginx-proxy
+    ports:
+      - "80:80"
+    volumes:
+      # Mount our NGINX configuration file into the container
+      - ./nginx.conf:/etc/nginx/nginx.conf:ro
+    depends_on:
+      - webapp1
+      - webapp2
